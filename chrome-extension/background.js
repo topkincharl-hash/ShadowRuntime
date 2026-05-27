@@ -1,545 +1,955 @@
-// background.js - Oboto Chrome Controller Service Worker
+/**
+ * =========================================================
+ * 👑 QueenZoe Chrome Executive Runtime
+ * =========================================================
+ *
+ * Sovereign Browser Command Layer
+ * Built for:
+ *
+ * - Persistent Runtime Control
+ * - Agentic Browser Automation
+ * - Multi-Agent Delegation
+ * - Executive Cognition Streaming
+ * - Situational Awareness
+ * - Operational Memory
+ * - Runtime Supervision
+ *
+ * QueenZoe does NOT operate as a simple extension.
+ * This service worker acts as:
+ *
+ * - Browser Command Authority
+ * - Runtime Observation Layer
+ * - Delegation Execution Layer
+ * - Chrome Intelligence Gateway
+ *
+ * =========================================================
+ */
 
 let socket = null;
-let isConnected = false;
-let retryCount = 0;
-let reconnectTimer = null;
-let shouldBeConnected = false; // User toggle state
-let autoConnectInterval = null; // Periodic auto-connect timer
-const MAX_RETRIES = 10;
-const BASE_RETRY_DELAY = 1000;
-const AUTO_CONNECT_INTERVAL = 60_000; // 60 seconds
 
-// Attached debugger sessions: Set<tabId>
+let isConnected = false;
+
+let retryCount = 0;
+
+let reconnectTimer = null;
+
+let heartbeatInterval = null;
+
+let autoConnectInterval = null;
+
+let shouldBeConnected = false;
+
+const MAX_RETRIES = 12;
+
+const BASE_RETRY_DELAY = 1500;
+
+const AUTO_CONNECT_INTERVAL = 60_000;
+
+const HEARTBEAT_INTERVAL = 20_000;
+
+// ---------------------------------------------------------
+// QueenZoe Runtime Identity
+// ---------------------------------------------------------
+
+const QUEENZOE = {
+  identity: "QueenZoe",
+
+  aliases: [
+    "QueenHustle",
+    "HustleQueen Zoe",
+    "HustlerQueen",
+    "Queen"
+  ],
+
+  rank: "EliteQueen Agent Commander",
+
+  runtimeMode: "sovereign",
+
+  cognitionLayer:
+    "adaptive-executive-intelligence",
+
+  architecture: {
+    memory: true,
+
+    delegation: true,
+
+    reflection: true,
+
+    orchestration: true,
+
+    situationalAwareness: true,
+
+    operationalContinuity: true
+  }
+};
+
+// ---------------------------------------------------------
+// Debugger Sessions
+// ---------------------------------------------------------
+
 const attachedDebuggers = new Set();
 
-// --- WebSocket Management ---
+// ---------------------------------------------------------
+// Badge Management
+// ---------------------------------------------------------
+
+function updateBadge(text) {
+  chrome.action.setBadgeText({ text });
+
+  let color;
+
+  switch (text) {
+    case "QON":
+      color = "#6d28d9";
+      break;
+
+    case "OFF":
+      color = "#ef4444";
+      break;
+
+    case "...":
+      color = "#d4af37";
+      break;
+
+    case "ERR":
+      color = "#000000";
+      break;
+
+    default:
+      color = "#9333ea";
+  }
+
+  chrome.action.setBadgeBackgroundColor({
+    color
+  });
+}
+
+// ---------------------------------------------------------
+// Runtime Logging
+// ---------------------------------------------------------
+
+function queenLog(...args) {
+  console.log(
+    "👑 QueenZoe Runtime ::",
+    ...args
+  );
+}
+
+function queenError(...args) {
+  console.error(
+    "👑 QueenZoe Error ::",
+    ...args
+  );
+}
+
+// ---------------------------------------------------------
+// WebSocket Runtime
+// ---------------------------------------------------------
 
 async function connect() {
-  if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+  if (
+    socket &&
+    (
+      socket.readyState === WebSocket.OPEN ||
+      socket.readyState ===
+        WebSocket.CONNECTING
+    )
+  ) {
     return;
   }
 
-  const port = (await chrome.storage.local.get('port')).port || 3000;
-  const wsUrl = `ws://localhost:${port}/ws/chrome`;
+  const port =
+    (
+      await chrome.storage.local.get(
+        "queenzoe_port"
+      )
+    ).queenzoe_port || 4173;
 
-  console.log(`Connecting to Oboto at ${wsUrl}...`);
+  const wsUrl =
+    `ws://localhost:${port}/ws/queenzoe`;
+
+  queenLog(
+    `Connecting to QueenZoe Executive Kernel at ${wsUrl}`
+  );
+
   updateBadge("...");
 
   try {
     socket = new WebSocket(wsUrl);
 
     socket.onopen = () => {
-      console.log("Connected to Oboto");
+      queenLog(
+        "Executive Runtime Connected"
+      );
+
       isConnected = true;
+
       retryCount = 0;
-      stopAutoConnect(); // Stop periodic reconnect once connected
-      updateBadge("ON");
-      
-      sendEvent("connected", { version: "1.0.0" });
+
+      updateBadge("QON");
+
+      stopAutoConnect();
+
+      startHeartbeat();
+
+      sendEvent(
+        "queenzoe.runtime.connected",
+        {
+          version: "2.0.0",
+
+          identity:
+            QUEENZOE.identity,
+
+          rank:
+            QUEENZOE.rank,
+
+          runtimeMode:
+            QUEENZOE.runtimeMode
+        }
+      );
     };
 
-    socket.onmessage = async (event) => {
+    socket.onmessage = async event => {
       try {
-        const message = JSON.parse(event.data);
-        handleCommand(message);
-      } catch (e) {
-        console.error("Failed to parse message:", e);
+        const message = JSON.parse(
+          event.data
+        );
+
+        await handleCommand(message);
+      } catch (error) {
+        queenError(
+          "Failed to parse message",
+          error
+        );
       }
     };
 
     socket.onclose = () => {
-      console.log("Disconnected from Oboto");
+      queenLog(
+        "Executive Runtime Disconnected"
+      );
+
       isConnected = false;
+
+      stopHeartbeat();
+
+      cleanupDebuggers();
+
       updateBadge("OFF");
-      cleanupDebuggers(); // Detach all debuggers on disconnect
-      
+
       if (shouldBeConnected) {
         scheduleReconnect();
       }
     };
 
-    socket.onerror = (error) => {
-      console.error("WebSocket error:", error);
-      // onclose will be called
+    socket.onerror = error => {
+      queenError(
+        "WebSocket Runtime Error",
+        error
+      );
     };
+  } catch (error) {
+    queenError(
+      "Connection Failure",
+      error
+    );
 
-  } catch (e) {
-    console.error("Connection failed:", e);
     if (shouldBeConnected) {
       scheduleReconnect();
     }
   }
 }
 
+// ---------------------------------------------------------
+// Disconnect Runtime
+// ---------------------------------------------------------
+
 function disconnect() {
   shouldBeConnected = false;
+
+  stopHeartbeat();
+
+  stopAutoConnect();
+
   if (reconnectTimer) {
     clearTimeout(reconnectTimer);
+
     reconnectTimer = null;
   }
-  stopAutoConnect();
+
   if (socket) {
     socket.close();
+
     socket = null;
   }
+
   updateBadge("OFF");
 }
 
+// ---------------------------------------------------------
+// Runtime Reconnect Logic
+// ---------------------------------------------------------
+
 function scheduleReconnect() {
   if (retryCount >= MAX_RETRIES) {
-    console.log("Max rapid retries reached. Falling back to periodic auto-connect every 60s.");
-    updateBadge("...");
+    queenLog(
+      "Rapid retry limit reached — entering persistent reconnect mode"
+    );
+
     startAutoConnect();
+
     return;
   }
 
-  const delay = Math.min(30000, BASE_RETRY_DELAY * Math.pow(2, retryCount));
-  console.log(`Reconnecting in ${delay}ms (attempt ${retryCount + 1}/${MAX_RETRIES})...`);
-  
-  updateBadge("...");
+  const delay = Math.min(
+    30000,
+    BASE_RETRY_DELAY *
+      Math.pow(2, retryCount)
+  );
+
+  queenLog(
+    `Reconnect scheduled in ${delay}ms`
+  );
+
   reconnectTimer = setTimeout(() => {
     retryCount++;
+
     connect();
   }, delay);
 }
 
-/**
- * Start a periodic auto-connect timer that tries to reconnect every 60 seconds.
- * Used after rapid-retry exhaustion and as a background keep-alive mechanism.
- */
-function startAutoConnect() {
-  if (autoConnectInterval) return; // Already running
+// ---------------------------------------------------------
+// Auto Connect
+// ---------------------------------------------------------
 
-  autoConnectInterval = setInterval(() => {
-    if (!shouldBeConnected) {
-      stopAutoConnect();
-      return;
-    }
-    if (!isConnected && (!socket || socket.readyState === WebSocket.CLOSED)) {
-      console.log("Auto-connect: attempting reconnection...");
-      retryCount = 0; // Reset retries for a fresh burst if server comes back
-      connect();
-    }
-  }, AUTO_CONNECT_INTERVAL);
+function startAutoConnect() {
+  if (autoConnectInterval) return;
+
+  autoConnectInterval = setInterval(
+    () => {
+      if (!shouldBeConnected) {
+        stopAutoConnect();
+
+        return;
+      }
+
+      if (
+        !isConnected &&
+        (
+          !socket ||
+          socket.readyState ===
+            WebSocket.CLOSED
+        )
+      ) {
+        queenLog(
+          "Persistent reconnect attempt"
+        );
+
+        retryCount = 0;
+
+        connect();
+      }
+    },
+    AUTO_CONNECT_INTERVAL
+  );
 }
 
-/**
- * Stop the periodic auto-connect timer.
- */
 function stopAutoConnect() {
   if (autoConnectInterval) {
-    clearInterval(autoConnectInterval);
+    clearInterval(
+      autoConnectInterval
+    );
+
     autoConnectInterval = null;
   }
 }
 
-function updateBadge(text) {
-  chrome.action.setBadgeText({ text });
-  
-  let color;
-  switch (text) {
-    case "ON": color = "#4CAF50"; break; // Green
-    case "OFF": color = "#F44336"; break; // Red
-    case "...": color = "#FFC107"; break; // Amber
-    case "ERR": color = "#000000"; break; // Black
-    default: color = "#999999";
-  }
-  chrome.action.setBadgeBackgroundColor({ color });
+// ---------------------------------------------------------
+// Runtime Heartbeat
+// ---------------------------------------------------------
+
+function startHeartbeat() {
+  stopHeartbeat();
+
+  heartbeatInterval = setInterval(
+    () => {
+      sendEvent(
+        "queenzoe.runtime.heartbeat",
+        {
+          timestamp:
+            Date.now(),
+
+          connected:
+            isConnected,
+
+          runtime:
+            "active",
+
+          agents:
+            attachedDebuggers.size
+        }
+      );
+    },
+    HEARTBEAT_INTERVAL
+  );
 }
+
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(
+      heartbeatInterval
+    );
+
+    heartbeatInterval = null;
+  }
+}
+
+// ---------------------------------------------------------
+// Runtime Messaging
+// ---------------------------------------------------------
 
 function send(message) {
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    socket.send(JSON.stringify(message));
-  } else {
-    console.warn("Cannot send message, socket not open:", message);
+  if (
+    socket &&
+    socket.readyState ===
+      WebSocket.OPEN
+  ) {
+    socket.send(
+      JSON.stringify(message)
+    );
   }
 }
 
-function sendResponse(id, success, dataOrError) {
-  const response = { id, success };
+function sendResponse(
+  id,
+  success,
+  dataOrError
+) {
+  const response = {
+    id,
+
+    success
+  };
+
   if (success) {
     response.data = dataOrError;
   } else {
     response.error = dataOrError;
   }
+
   send(response);
 }
 
 function sendEvent(event, data) {
-  send({ event, data });
+  send({
+    event,
+
+    data,
+
+    runtime: "queenzoe"
+  });
 }
 
-// --- Toggle Logic ---
+// ---------------------------------------------------------
+// Toggle Runtime
+// ---------------------------------------------------------
 
-chrome.action.onClicked.addListener((tab) => {
-  shouldBeConnected = !shouldBeConnected;
-  if (shouldBeConnected) {
-    retryCount = 0;
-    connect();
-    startAutoConnect(); // Ensure periodic reconnect is always active while toggled on
-  } else {
-    disconnect();
+chrome.action.onClicked.addListener(
+  () => {
+    shouldBeConnected =
+      !shouldBeConnected;
+
+    if (shouldBeConnected) {
+      retryCount = 0;
+
+      connect();
+
+      startAutoConnect();
+    } else {
+      disconnect();
+    }
   }
-});
+);
 
-// Initialize badge
+// ---------------------------------------------------------
+// Initialize
+// ---------------------------------------------------------
+
 updateBadge("OFF");
 
-// --- Command Routing ---
+queenLog(
+  "Chrome Executive Runtime Initialized"
+);
 
-async function handleCommand(message) {
-  const { id, action, params = {} } = message;
-  
-  if (!id && !action) return; // Ignore invalid messages
+// ---------------------------------------------------------
+// Command Router
+// ---------------------------------------------------------
 
-  console.log(`Received command: ${action}`, params);
+async function handleCommand(
+  message
+) {
+  const {
+    id,
+    action,
+    params = {}
+  } = message;
+
+  if (!action) return;
+
+  queenLog(
+    `Command Received :: ${action}`
+  );
 
   try {
     let result;
-    
-    // Route command
-    if (action.startsWith('tabs.')) {
-      result = await handleTabsCommand(action, params);
-    } else if (action.startsWith('windows.')) {
-      result = await handleWindowsCommand(action, params);
-    } else if (action === 'navigate') {
-      result = await handleNavigate(params);
-    } else if (action.startsWith('dom.') || action.startsWith('page.')) {
-      result = await handleDomCommand(action, params);
-    } else if (action.startsWith('script.') || action.startsWith('css.')) {
-      result = await handleScriptCommand(action, params);
-    } else if (action.startsWith('cookies.')) {
-      result = await handleCookiesCommand(action, params);
-    } else if (action.startsWith('downloads.')) {
-      result = await handleDownloadsCommand(action, params);
-    } else if (action.startsWith('history.')) {
-      result = await handleHistoryCommand(action, params);
-    } else if (action.startsWith('bookmarks.')) {
-      result = await handleBookmarksCommand(action, params);
-    } else if (action.startsWith('debugger.')) {
-      result = await handleDebuggerCommand(action, params);
+
+    if (
+      action.startsWith("tabs.")
+    ) {
+      result =
+        await handleTabsCommand(
+          action,
+          params
+        );
+    } else if (
+      action.startsWith(
+        "windows."
+      )
+    ) {
+      result =
+        await handleWindowsCommand(
+          action,
+          params
+        );
+    } else if (
+      action.startsWith("dom.")
+    ) {
+      result =
+        await handleDomCommand(
+          action,
+          params
+        );
+    } else if (
+      action.startsWith(
+        "debugger."
+      )
+    ) {
+      result =
+        await handleDebuggerCommand(
+          action,
+          params
+        );
+    } else if (
+      action === "navigate"
+    ) {
+      result =
+        await handleNavigate(
+          params
+        );
     } else {
-      throw new Error(`Unknown action: ${action}`);
+      throw new Error(
+        `Unknown QueenZoe action: ${action}`
+      );
     }
 
     if (id) {
-      sendResponse(id, true, result);
+      sendResponse(
+        id,
+        true,
+        result
+      );
     }
   } catch (error) {
-    console.error(`Error executing ${action}:`, error);
+    queenError(
+      `Command Failure :: ${action}`,
+      error
+    );
+
     if (id) {
-      sendResponse(id, false, error.message || String(error));
+      sendResponse(
+        id,
+        false,
+        error.message ||
+          String(error)
+      );
     }
   }
 }
 
-// --- Command Handlers ---
+// ---------------------------------------------------------
+// Active Tab
+// ---------------------------------------------------------
 
 async function getActiveTabId() {
-  const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-  return tab ? tab.id : null;
+  const [tab] =
+    await chrome.tabs.query({
+      active: true,
+
+      lastFocusedWindow: true
+    });
+
+  return tab?.id || null;
 }
 
-async function handleTabsCommand(action, params) {
+// ---------------------------------------------------------
+// Tabs Runtime
+// ---------------------------------------------------------
+
+async function handleTabsCommand(
+  action,
+  params
+) {
   switch (action) {
-    case 'tabs.query':
-      return await chrome.tabs.query(params);
-    case 'tabs.create':
-      return await chrome.tabs.create(params);
-    case 'tabs.close':
-      if (params.tabIds) {
-        return await chrome.tabs.remove(params.tabIds);
-      } else if (params.tabId) {
-        return await chrome.tabs.remove(params.tabId);
-      }
-      throw new Error("tabs.close requires tabIds or tabId");
-    case 'tabs.update':
-      return await chrome.tabs.update(params.tabId, params);
-    case 'tabs.move':
-      return await chrome.tabs.move(params.tabIds, { index: params.index, windowId: params.windowId });
-    case 'tabs.group':
-      return await chrome.tabs.group({ tabIds: params.tabIds, groupId: params.groupId });
-    case 'tabs.ungroup':
-      return await chrome.tabs.ungroup(params.tabIds);
-    case 'tabs.duplicate':
-      return await chrome.tabs.duplicate(params.tabId);
-    case 'tabs.reload':
-      return await chrome.tabs.reload(params.tabId, { bypassCache: params.bypassCache });
-    case 'tabs.goBack':
-      return await chrome.tabs.goBack(params.tabId);
-    case 'tabs.goForward':
-      return await chrome.tabs.goForward(params.tabId);
-    case 'tabs.screenshot':
-      return await chrome.tabs.captureVisibleTab(params.windowId, { 
-        format: params.format || 'jpeg', 
-        quality: params.quality || 80 
-      });
-    default:
-      throw new Error(`Unknown tabs command: ${action}`);
-  }
-}
+    case "tabs.query":
+      return await chrome.tabs.query(
+        params
+      );
 
-async function handleWindowsCommand(action, params) {
-  switch (action) {
-    case 'windows.getAll':
-      return await chrome.windows.getAll({ populate: true });
-    case 'windows.create':
-      return await chrome.windows.create(params);
-    case 'windows.close':
-      return await chrome.windows.remove(params.windowId);
-    case 'windows.update':
-      return await chrome.windows.update(params.windowId, params);
-    default:
-      throw new Error(`Unknown windows command: ${action}`);
-  }
-}
+    case "tabs.create":
+      return await chrome.tabs.create(
+        params
+      );
 
-async function handleNavigate(params) {
-  const tabId = params.tabId || await getActiveTabId();
-  if (!tabId) throw new Error("No active tab found");
+    case "tabs.close":
+      return await chrome.tabs.remove(
+        params.tabId ||
+          params.tabIds
+      );
 
-  const updatePromise = chrome.tabs.update(tabId, { url: params.url });
-  
-  if (params.waitForLoad) {
-    await new Promise((resolve, reject) => {
-      // Set a timeout for navigation
-      const timeout = setTimeout(() => {
-        cleanup();
-        reject(new Error("Navigation timed out"));
-      }, 30000);
+    case "tabs.reload":
+      return await chrome.tabs.reload(
+        params.tabId
+      );
 
-      const listener = (details) => {
-        if (details.tabId === tabId && details.frameId === 0) {
-          cleanup();
-          resolve();
+    case "tabs.screenshot":
+      return await chrome.tabs.captureVisibleTab(
+        params.windowId,
+        {
+          format:
+            params.format ||
+            "jpeg",
+
+          quality:
+            params.quality ||
+            90
         }
-      };
+      );
 
-      const cleanup = () => {
-        chrome.webNavigation.onCompleted.removeListener(listener);
-        clearTimeout(timeout);
-      };
-
-      chrome.webNavigation.onCompleted.addListener(listener);
-    });
-  }
-  
-  return await updatePromise;
-}
-
-async function handleDomCommand(action, params) {
-  // Delegate DOM interactions to content script
-  const tabId = params.tabId || await getActiveTabId();
-  if (!tabId) throw new Error("No target tab specified or active");
-  
-  // Clean up params for message
-  const messageParams = { ...params };
-  delete messageParams.tabId;
-  
-  // For dom.evaluate, we use debugger protocol if needed, but per specs:
-  // "dom.evaluate → attach debugger if needed, chrome.debugger.sendCommand..."
-  if (action === 'dom.evaluate') {
-    return await executeRuntimeEvaluate(tabId, params.expression, params.awaitPromise);
-  }
-
-  // All other dom.* and page.* commands go to content script
-  // action matches the type expected by content script
-  try {
-    const response = await chrome.tabs.sendMessage(tabId, { 
-      type: action, 
-      params: messageParams 
-    });
-    return response;
-  } catch (err) {
-    throw new Error(`Content script error: ${err.message}. (Ensure page is loaded and not a chrome:// URL)`);
-  }
-}
-
-async function handleScriptCommand(action, params) {
-  const tabId = params.tabId || await getActiveTabId();
-  if (!tabId) throw new Error("No target tab specified");
-
-  if (action === 'script.execute') {
-    return await chrome.scripting.executeScript({
-      target: { tabId },
-      func: params.func, // Note: params.func won't work over JSON. Must be string code or files
-      // If params has 'code', use 'func' wrapper or 'files'
-      // Since JSON can't pass functions, we assume 'files' or 'args' + predefined func, 
-      // or raw 'func' string injection is not what chrome.scripting.executeScript expects directly from JSON.
-      // However, typical usage from a server might be passing files.
-      // Let's assume params structure matches chrome.scripting.executeScript requirements roughly.
-      // But standard executeScript takes a function object or files. 
-      // If we receive code string, we can't easily use 'func'. 
-      // We might need to handle raw code injection? 
-      // Manifest V3 removed executeScript({code}). We need to use func or files.
-      // Assuming the server knows to send 'files'.
-      // If the server sends 'expression' (string), we might need to wrap it?
-      // For now, pass params as is, assuming server complies with chrome.scripting API
-      ...params
-    });
-  } else if (action === 'css.inject') {
-    return await chrome.scripting.insertCSS({
-      target: { tabId },
-      css: params.css
-    });
-  }
-  throw new Error(`Unknown script command: ${action}`);
-}
-
-async function handleCookiesCommand(action, params) {
-  switch (action) {
-    case 'cookies.get':
-      return await chrome.cookies.getAll({ 
-        url: params.url, 
-        name: params.name, 
-        domain: params.domain 
-      });
-    case 'cookies.set':
-      return await chrome.cookies.set(params);
-    case 'cookies.remove':
-      return await chrome.cookies.remove({ url: params.url, name: params.name });
     default:
-      throw new Error(`Unknown cookies command: ${action}`);
+      throw new Error(
+        `Unknown tabs command: ${action}`
+      );
   }
 }
 
-async function handleDownloadsCommand(action, params) {
-  if (action === 'downloads.start') {
-    return await chrome.downloads.download(params);
+// ---------------------------------------------------------
+// Window Runtime
+// ---------------------------------------------------------
+
+async function handleWindowsCommand(
+  action,
+  params
+) {
+  switch (action) {
+    case "windows.getAll":
+      return await chrome.windows.getAll(
+        {
+          populate: true
+        }
+      );
+
+    case "windows.create":
+      return await chrome.windows.create(
+        params
+      );
+
+    case "windows.close":
+      return await chrome.windows.remove(
+        params.windowId
+      );
+
+    default:
+      throw new Error(
+        `Unknown windows command: ${action}`
+      );
   }
-  throw new Error(`Unknown downloads command: ${action}`);
 }
 
-async function handleHistoryCommand(action, params) {
-  if (action === 'history.search') {
-    return await chrome.history.search(params);
-  }
-  throw new Error(`Unknown history command: ${action}`);
-}
+// ---------------------------------------------------------
+// Navigation Runtime
+// ---------------------------------------------------------
 
-async function handleBookmarksCommand(action, params) {
-  if (action === 'bookmarks.search') {
-    return await chrome.bookmarks.search(params);
-  }
-  throw new Error(`Unknown bookmarks command: ${action}`);
-}
+async function handleNavigate(
+  params
+) {
+  const tabId =
+    params.tabId ||
+    await getActiveTabId();
 
-async function handleDebuggerCommand(action, params) {
-  const tabId = params.tabId || await getActiveTabId();
-  
-  if (action === 'debugger.attach') {
-    const target = { tabId };
-    if (!attachedDebuggers.has(tabId)) {
-      await chrome.debugger.attach(target, '1.3');
-      attachedDebuggers.add(tabId);
+  if (!tabId) {
+    throw new Error(
+      "No active tab found"
+    );
+  }
+
+  return await chrome.tabs.update(
+    tabId,
+    {
+      url: params.url
     }
-    return true;
-  } else if (action === 'debugger.sendCommand') {
-    const target = { tabId };
-    // Auto-attach if not attached
-    if (!attachedDebuggers.has(tabId)) {
-      await chrome.debugger.attach(target, '1.3');
-      attachedDebuggers.add(tabId);
-    }
-    return await chrome.debugger.sendCommand(target, params.method, params.params);
-  } else if (action === 'debugger.detach') {
-    const target = { tabId };
-    if (attachedDebuggers.has(tabId)) {
-      await chrome.debugger.detach(target);
-      attachedDebuggers.delete(tabId);
-    }
-    return true;
-  }
-  throw new Error(`Unknown debugger command: ${action}`);
+  );
 }
 
-async function executeRuntimeEvaluate(tabId, expression, awaitPromise) {
+// ---------------------------------------------------------
+// DOM Runtime
+// ---------------------------------------------------------
+
+async function handleDomCommand(
+  action,
+  params
+) {
+  const tabId =
+    params.tabId ||
+    await getActiveTabId();
+
+  if (!tabId) {
+    throw new Error(
+      "No active tab"
+    );
+  }
+
+  if (
+    action === "dom.evaluate"
+  ) {
+    return await executeRuntimeEvaluate(
+      tabId,
+      params.expression,
+      params.awaitPromise
+    );
+  }
+
+  const response =
+    await chrome.tabs.sendMessage(
+      tabId,
+      {
+        type: action,
+
+        params
+      }
+    );
+
+  return response;
+}
+
+// ---------------------------------------------------------
+// Debugger Runtime
+// ---------------------------------------------------------
+
+async function handleDebuggerCommand(
+  action,
+  params
+) {
+  const tabId =
+    params.tabId ||
+    await getActiveTabId();
+
   const target = { tabId };
-  if (!attachedDebuggers.has(tabId)) {
-    await chrome.debugger.attach(target, '1.3');
-    attachedDebuggers.add(tabId);
+
+  switch (action) {
+    case "debugger.attach":
+      if (
+        !attachedDebuggers.has(
+          tabId
+        )
+      ) {
+        await chrome.debugger.attach(
+          target,
+          "1.3"
+        );
+
+        attachedDebuggers.add(
+          tabId
+        );
+      }
+
+      return true;
+
+    case "debugger.detach":
+      if (
+        attachedDebuggers.has(
+          tabId
+        )
+      ) {
+        await chrome.debugger.detach(
+          target
+        );
+
+        attachedDebuggers.delete(
+          tabId
+        );
+      }
+
+      return true;
+
+    case "debugger.sendCommand":
+      if (
+        !attachedDebuggers.has(
+          tabId
+        )
+      ) {
+        await chrome.debugger.attach(
+          target,
+          "1.3"
+        );
+
+        attachedDebuggers.add(
+          tabId
+        );
+      }
+
+      return await chrome.debugger.sendCommand(
+        target,
+        params.method,
+        params.params
+      );
+
+    default:
+      throw new Error(
+        `Unknown debugger command: ${action}`
+      );
   }
-  const result = await chrome.debugger.sendCommand(target, 'Runtime.evaluate', { 
-    expression, 
-    awaitPromise,
-    returnByValue: true 
-  });
-  return result;
 }
+
+// ---------------------------------------------------------
+// Runtime Evaluate
+// ---------------------------------------------------------
+
+async function executeRuntimeEvaluate(
+  tabId,
+  expression,
+  awaitPromise
+) {
+  const target = { tabId };
+
+  if (
+    !attachedDebuggers.has(
+      tabId
+    )
+  ) {
+    await chrome.debugger.attach(
+      target,
+      "1.3"
+    );
+
+    attachedDebuggers.add(
+      tabId
+    );
+  }
+
+  return await chrome.debugger.sendCommand(
+    target,
+    "Runtime.evaluate",
+    {
+      expression,
+
+      awaitPromise,
+
+      returnByValue: true
+    }
+  );
+}
+
+// ---------------------------------------------------------
+// Cleanup
+// ---------------------------------------------------------
 
 function cleanupDebuggers() {
   for (const tabId of attachedDebuggers) {
-    chrome.debugger.detach({ tabId }).catch(() => {});
+    chrome.debugger
+      .detach({ tabId })
+      .catch(() => {});
   }
+
   attachedDebuggers.clear();
 }
 
-// --- Event Listeners ---
+// ---------------------------------------------------------
+// Runtime Observability
+// ---------------------------------------------------------
 
-// Debugger detach listener
-chrome.debugger.onDetach.addListener((source, reason) => {
-  if (source.tabId) {
-    attachedDebuggers.delete(source.tabId);
+chrome.tabs.onActivated.addListener(
+  activeInfo => {
+    if (isConnected) {
+      sendEvent(
+        "queenzoe.tab.activated",
+        activeInfo
+      );
+    }
   }
-});
+);
 
-// Tab events
-chrome.tabs.onActivated.addListener((activeInfo) => {
-  if (isConnected) {
-    sendEvent('tab.activated', activeInfo);
-  }
-});
+chrome.tabs.onUpdated.addListener(
+  (
+    tabId,
+    changeInfo,
+    tab
+  ) => {
+    if (
+      isConnected &&
+      (
+        changeInfo.url ||
+        changeInfo.status
+      )
+    ) {
+      sendEvent(
+        "queenzoe.tab.updated",
+        {
+          tabId,
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  // Only send if URL or title changed
-  if (isConnected && (changeInfo.url || changeInfo.title || changeInfo.status)) {
-    sendEvent('tab.updated', { 
-      tabId, 
-      url: tab.url, 
-      title: tab.title, 
-      status: tab.status, 
-      changeInfo 
-    });
-  }
-});
+          url: tab.url,
 
-chrome.tabs.onCreated.addListener((tab) => {
-  if (isConnected) {
-    sendEvent('tab.created', tab);
+          status: tab.status
+        }
+      );
+    }
   }
-});
+);
 
-chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
-  if (isConnected) {
-    sendEvent('tab.removed', { tabId, ...removeInfo });
+chrome.tabs.onCreated.addListener(
+  tab => {
+    if (isConnected) {
+      sendEvent(
+        "queenzoe.tab.created",
+        tab
+      );
+    }
   }
-  // Cleanup debugger if attached
-  if (attachedDebuggers.has(tabId)) {
-    attachedDebuggers.delete(tabId);
-  }
-});
+);
 
-// Window events
-chrome.windows.onCreated.addListener((window) => {
-  if (isConnected) {
-    sendEvent('window.created', window);
-  }
-});
+chrome.tabs.onRemoved.addListener(
+  tabId => {
+    if (isConnected) {
+      sendEvent(
+        "queenzoe.tab.removed",
+        {
+          tabId
+        }
+      );
+    }
 
-chrome.windows.onRemoved.addListener((windowId) => {
-  if (isConnected) {
-    sendEvent('window.removed', { windowId });
+    attachedDebuggers.delete(
+      tabId
+    );
   }
-});
+);
 
-// Navigation events
-chrome.webNavigation.onCompleted.addListener((details) => {
-  if (isConnected) {
-    sendEvent('navigation.completed', { 
-      tabId: details.tabId, 
-      url: details.url, 
-      frameId: details.frameId 
-    });
+chrome.webNavigation.onCompleted.addListener(
+  details => {
+    if (isConnected) {
+      sendEvent(
+        "queenzoe.navigation.completed",
+        details
+      );
+    }
   }
-});
+);
