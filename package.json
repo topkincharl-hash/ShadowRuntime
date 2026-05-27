@@ -1,159 +1,344 @@
 {
-  "name": "@sschepis/oboto",
-  "version": "1.2.1",
+  "name": "@hustlenation/queenzoe",
+  "version": "2.0.0",
   "type": "module",
-  "description": "Oboto: AI-powered everything assistant",
-  "author": "sschepis",
+  "description": "QueenZoe Sovereign Executive Intelligence — Long-lived multi-agent orchestration cognition system",
+  "author": "HustleNation",
   "license": "MIT",
+
+  "homepage": "https://queenzoe.ai",
+
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sschepis/oboto.git"
+    "url": "git+https://github.com/hustlenation/queenzoe.git"
   },
+
   "keywords": [
+    "queenzoe",
+    "hustlenation",
     "ai",
-    "assistant",
-    "agent",
+    "agentic-ai",
+    "langgraph",
+    "executive-ai",
+    "multi-agent",
+    "orchestration",
+    "memory",
     "automation",
-    "llm",
-    "dev-tool"
+    "voice-ai",
+    "cognitive-system",
+    "sovereign-ai",
+    "apk",
+    "pwa"
   ],
+
   "bin": {
-    "oboto": "./ai.mjs",
-    "oboto-server": "./bin/oboto-server.mjs"
+    "queenzoe": "./queenzoe.mjs",
+    "queenzoe-server": "./bin/queenzoe-server.mjs",
+    "hustlenation": "./bin/hustlenation.mjs"
   },
+
   "main": "src/lib/index.mjs",
+
   "module": "src/lib/index.mjs",
+
   "types": "src/lib/interfaces.d.ts",
+
   "sideEffects": false,
+
   "exports": {
     ".": {
       "types": "./src/lib/interfaces.d.ts",
       "import": "./src/lib/index.mjs",
       "default": "./src/lib/index.mjs"
     },
-    "./cli": "./ai.mjs",
+
+    "./cli": "./queenzoe.mjs",
+
     "./lib": {
       "types": "./src/lib/interfaces.d.ts",
       "import": "./src/lib/index.mjs",
       "default": "./src/lib/index.mjs"
     },
-    "./adapters": {
-      "types": "./src/lib/interfaces.d.ts",
-      "import": "./src/lib/adapters/index.mjs",
-      "default": "./src/lib/adapters/index.mjs"
+
+    "./kernel": {
+      "import": "./src/kernel/executive-kernel.mjs",
+      "default": "./src/kernel/executive-kernel.mjs"
     },
+
+    "./agents": {
+      "import": "./src/agents/index.mjs",
+      "default": "./src/agents/index.mjs"
+    },
+
+    "./memory": {
+      "import": "./src/memory/index.mjs",
+      "default": "./src/memory/index.mjs"
+    },
+
+    "./voice": {
+      "import": "./src/voice/index.mjs",
+      "default": "./src/voice/index.mjs"
+    },
+
     "./server": {
       "import": "./src/server/server.mjs",
       "default": "./src/server/server.mjs"
     },
+
     "./plugins": {
       "import": "./src/plugins/index.mjs",
       "default": "./src/plugins/index.mjs"
     },
+
     "./types": "./src/types/shared.mjs",
+
     "./package.json": "./package.json"
   },
+
   "typesVersions": {
     "*": {
       ".": [
         "src/lib/interfaces.d.ts"
       ],
+
       "lib": [
         "src/lib/interfaces.d.ts"
       ],
-      "adapters": [
+
+      "agents": [
+        "src/lib/interfaces.d.ts"
+      ],
+
+      "memory": [
         "src/lib/interfaces.d.ts"
       ]
     }
   },
+
   "files": [
-    "ai.mjs",
+    "queenzoe.mjs",
+
     "bin/",
+
     "src/**/*.mjs",
+
     "src/**/*.d.ts",
+
     "!src/**/__tests__/**",
+
     "!src/**/*.test.*",
+
     "!src/**/*.spec.*",
-    "!src/client/**",
-    "!src/gateway/**",
-    "!src/service/**",
+
     "src/lib/README.md",
-    "src/server/scripts/",
+
     "plugins/**/*.mjs",
+
     "plugins/**/*.json",
+
     "plugins/**/*.jsx",
+
     "!plugins/**/node_modules/**",
+
     "themes.json",
+
     ".env.example",
+
     "README.md",
+
     "LICENSE"
   ],
+
   "scripts": {
-    "start": "node ai.mjs",
-    "start:server": "node ai.mjs --server",
+    "start": "node queenzoe.mjs",
+
+    "start:server": "node queenzoe.mjs --server",
+
+    "start:queen": "node src/kernel/executive-kernel.mjs",
+
+    "start:runtime": "node src/runtime/runtime-manager.mjs",
+
+    "start:heartbeat": "node src/runtime/heartbeat.mjs",
+
     "serve": "node src/server/server.mjs",
+
     "build:ui": "cd ui && pnpm install && pnpm run build",
+
     "dev:ui": "cd ui && pnpm run dev",
+
     "build:all": "pnpm install && pnpm run build:ui",
+
+    "dev": "concurrently \"pnpm run start:server\" \"pnpm run dev:ui\"",
+
     "tray": "cd tray-app && npx electron .",
+
     "tray:dev": "cd tray-app && npx electron . --dev",
+
     "tray:install": "cd tray-app && npm install",
+
     "tray:build:mac": "cd tray-app && npx electron-builder --mac",
+
     "tray:build:win": "cd tray-app && npx electron-builder --win",
+
+    "apk:sync": "npx cap sync",
+
+    "apk:android": "npx cap open android",
+
+    "pwa:build": "vite build",
+
+    "memory:index": "node src/memory/indexer.mjs",
+
+    "memory:clean": "node src/memory/cleanup.mjs",
+
+    "agents:start": "node src/agents/launcher.mjs",
+
+    "reflection:run": "node src/reflection/reflection-engine.mjs",
+
+    "heartbeat:run": "node src/runtime/heartbeat.mjs",
+
+    "vector:sync": "node src/vector/sync.mjs",
+
+    "voice:start": "node src/voice/realtime-voice.mjs",
+
     "test": "vitest run",
-    "test:routes": "node --test src/server/__tests__/dynamic-router.test.mjs",
-    "install:skills": "node scripts/install-skills.mjs",
-    "check:deps": "node --input-type=module -e \"import{readFileSync}from'node:fs';const p=JSON.parse(readFileSync('./package.json','utf8'));if(Object.values(p.dependencies||{}).some(v=>v.includes('workspace:'))){console.error('ERROR: workspace: protocol deps found');process.exit(1)}else{console.log('Dependencies OK')}\"",
-    "check:exports": "node --input-type=module -e \"async function run(){const m=await import('./src/lib/index.mjs');const exports=['AiMan','Oboto','ConsoleStatusAdapter','NetworkLLMAdapter','MemoryAdapter','AiManEventBus','MiddlewareChain','CancellationError','DesignResult','TaskManager','TaskCheckpointManager','CheckpointStore','AssistantFacade','config','FlowManager'];const missing=exports.filter(e=>!m[e]);if(missing.length){console.error('Missing lib exports:',missing);process.exit(1)}console.log('All',exports.length,'lib exports OK');const s=await import('./src/server/server.mjs');if(!s.createServer){console.error('Missing server export: createServer');process.exit(1)}console.log('Server export OK');const p=await import('./src/plugins/index.mjs');const pExports=['PluginManager','PluginLoader','createPluginAPI','PluginStorage'];const pMissing=pExports.filter(e=>!p[e]);if(pMissing.length){console.error('Missing plugin exports:',pMissing);process.exit(1)}console.log('All',pExports.length,'plugin exports OK')}run().catch(e=>{console.error('Export check FAILED:',e.message);process.exit(1)})\"",
-    "postinstall": "node -e \"try{require('child_process').execSync('npx node-gyp rebuild --directory=node_modules/node-pty',{stdio:'inherit'})}catch{console.log('node-pty rebuild skipped (optional)')}\" && pnpm run install:skills",
-    "prepublishOnly": "npm run check:deps && npm run check:exports",
-    "test:watch": "vitest"
+
+    "test:watch": "vitest",
+
+    "lint": "eslint .",
+
+    "format": "prettier --write .",
+
+    "postinstall": "pnpm run install:skills",
+
+    "install:skills": "node scripts/install-skills.mjs"
   },
+
   "dependencies": {
-    "@aleph-ai/tinyaleph": "^1.7.3",
-    "@anthropic-ai/vertex-sdk": "^0.14.3",
+    "@anthropic-ai/sdk": "^0.57.0",
+
+    "@capacitor/android": "^7.4.2",
+
+    "@capacitor/app": "^7.0.2",
+
+    "@capacitor/core": "^7.4.2",
+
+    "@capacitor/haptics": "^7.0.2",
+
+    "@capacitor/keyboard": "^7.0.2",
+
+    "@capacitor/push-notifications": "^7.0.2",
+
+    "@capacitor/splash-screen": "^7.0.2",
+
+    "@capacitor/status-bar": "^7.0.2",
+
     "@google/genai": "^1.41.0",
+
+    "@langchain/community": "^0.3.55",
+
+    "@langchain/core": "^0.3.75",
+
+    "@langchain/langgraph": "^0.2.74",
+
+    "@langchain/openai": "^0.6.12",
+
     "@mlc-ai/web-llm": "^0.2.81",
+
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "@nut-tree-fork/nut-js": "^4.2.6",
-    "@sschepis/as-agent": "0.1.2",
-    "@sschepis/llm-wrapper": "^0.3.2",
-    "@sschepis/lmscript": "^0.1.4",
-    "@sschepis/oboto-agent": "^0.2.16",
-    "@sschepis/resolang": "^0.5.0",
-    "@sschepis/swiss-army-tool": "^0.1.6",
+
+    "@qdrant/js-client-rest": "^1.15.0",
+
+    "@radix-ui/react-dialog": "^1.1.15",
+
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+
+    "@radix-ui/react-tooltip": "^1.2.8",
+
+    "@supabase/supabase-js": "^2.76.1",
+
+    "@tanstack/react-query": "^5.90.3",
+
+    "axios": "^1.12.2",
+
     "body-parser": "^2.2.2",
-    "boxen": "^8.0.1",
+
     "chalk": "^5.5.0",
-    "cheerio": "^1.2.0",
+
+    "cheerio": "^1.1.2",
+
     "chokidar": "^5.0.0",
-    "cli-spinners": "^3.2.0",
+
+    "clsx": "^2.1.1",
+
+    "concurrently": "^9.2.1",
+
     "dotenv": "^17.3.1",
-    "express": "^5.2.1",
-    "figures": "^6.1.0",
-    "gradient-string": "^3.0.0",
-    "mathjs": "^14.6.0",
+
+    "express": "^5.1.0",
+
+    "framer-motion": "^12.23.24",
+
+    "langchain": "^0.3.36",
+
+    "lucide-react": "^0.542.0",
+
+    "mathjs": "^14.7.0",
+
+    "node-cron": "^4.2.1",
+
     "node-llama-cpp": "^3.18.1",
+
     "node-pty": "^1.1.0",
+
+    "openai": "^5.20.2",
+
     "ora": "^8.2.0",
+
     "pdf-parse": "^1.1.1",
-    "puppeteer": "^24.37.3",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "sharp": "^0.34.5",
+
+    "puppeteer": "^24.22.3",
+
+    "qdrant-client": "^1.14.0",
+
+    "react": "^19.1.1",
+
+    "react-dom": "^19.1.1",
+
+    "react-router-dom": "^7.8.2",
+
+    "recharts": "^3.1.2",
+
+    "sharp": "^0.34.3",
+
+    "socket.io": "^4.8.1",
+
+    "socket.io-client": "^4.8.1",
+
+    "tailwind-merge": "^3.3.1",
+
+    "uuid": "^11.1.0",
+
+    "vite-plugin-pwa": "^1.0.3",
+
     "vm2": "^3.10.4",
-    "ws": "^8.19.0",
-    "zod": "=3.25.76"
+
+    "ws": "^8.18.3",
+
+    "zod": "^3.25.76"
   },
+
   "optionalDependencies": {
     "@bubblelab/bubble-core": "^0.1.229",
+
     "@bubblelab/bubble-runtime": "^0.1.229",
-    "@bubblelab/shared-schemas": "^0.1.229",
-    "@bubblelab/ts-scope-manager": "^0.1.229"
+
+    "@bubblelab/shared-schemas": "^0.1.229"
   },
+
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
+
   "pnpm": {
     "onlyBuiltDependencies": [
       "canvas",
@@ -161,36 +346,41 @@
       "node-pty",
       "protobufjs",
       "puppeteer",
-      "sharp",
-      "unrs-resolver"
-    ],
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "@langchain/core"
-      ],
-      "allowAny": [
-        "dotenv",
-        "openai",
-        "@mendable/firecrawl-js",
-        "pdf-parse",
-        "typescript"
-      ]
-    },
-    "overrides": {}
+      "sharp"
+    ]
   },
+
   "devDependencies": {
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.2",
-    "@types/chokidar": "^1.7.5",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^25.2.3",
-    "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3",
-    "jest": "^30.2.0",
-    "jest-environment-jsdom": "^30.2.0",
-    "jsdom": "^29.0.2",
-    "supertest": "^7.2.2",
-    "ts-jest": "^29.4.6",
-    "vitest": "^4.1.4"
+    "@testing-library/jest-dom": "^6.8.0",
+
+    "@testing-library/react": "^16.3.0",
+
+    "@types/node": "^24.3.1",
+
+    "@types/react": "^19.1.12",
+
+    "@types/react-dom": "^19.1.9",
+
+    "@vitejs/plugin-react": "^5.0.2",
+
+    "autoprefixer": "^10.4.21",
+
+    "eslint": "^9.35.0",
+
+    "eslint-config-prettier": "^10.1.8",
+
+    "eslint-plugin-react": "^7.37.5",
+
+    "postcss": "^8.5.6",
+
+    "prettier": "^3.6.2",
+
+    "tailwindcss": "^4.1.13",
+
+    "typescript": "^5.9.2",
+
+    "vite": "^7.1.5",
+
+    "vitest": "^3.2.4"
   }
 }
