@@ -1,24 +1,321 @@
-# Logs
-logs
+# =========================================================
+# 👑 QUEENZOE / HUSTLENATION
+# Sovereign Intelligence Command System
+# =========================================================
+
+# =========================================================
+# NODE / PACKAGE MANAGERS
+# =========================================================
+
+node_modules/
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# =========================================================
+# ENVIRONMENT / SECRETS
+# =========================================================
+
+.env
+.env.*
+!.env.example
+
+.secrets.enc
+.secrets.enc.bak
+
+*.pem
+*.key
+*.crt
+
+# AI provider secrets
+openai.key
+anthropic.key
+gemini.key
+
+# =========================================================
+# LOGS / DEBUGGING
+# =========================================================
+
 *.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
+yarn-debug.log*
+server.log
 
-node_modules
-dist
-dist-ssr
-*.local
+logs/
+debug/
+trace/
 
-# Editor directories and files
+analysis_result.json
+analysis_result_v2.json
+line_count.txt
+
+# =========================================================
+# OPERATING SYSTEM
+# =========================================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================================================
+# BUILD OUTPUTS
+# =========================================================
+
+dist/
+build/
+out/
+coverage/
+
+ui/dist/
+tray-app/dist/
+
+.vercel/
+.netlify/
+
+# =========================================================
+# VITE / PWA
+# =========================================================
+
+vite.svg
+
+dist-pwa/
+.workbox/
+.sw-cache/
+
+# =========================================================
+# CAPACITOR / ANDROID
+# =========================================================
+
+android/.gradle/
+android/build/
+android/app/build/
+
+android/local.properties
+
+*.keystore
+*.jks
+
+capacitor.config.ts.timestamp-*
+
+# Android Studio
+.idea/
+.gradle/
+
+# =========================================================
+# ELECTRON
+# =========================================================
+
+.backend-modules/
+.backend-staging/
+
+electron-dist/
+release/
+
+# =========================================================
+# AI MEMORY / RUNTIME
+# =========================================================
+
+.memory/
+.memory.json
+
+.vector-cache/
+.vector-db/
+.embeddings/
+
+facts.json
+
+.conversations/
+.snapshots/
+
+.ai-session.history.json
+.ai-session.workspace.json
+
+# =========================================================
+# HUSTLENATION AGENT RUNTIME
+# =========================================================
+
+.hustlenation/
+.queenzoe/
+
+agent-runtime/
+agent-memory/
+agent-cache/
+agent-state/
+
+reflection-cache/
+thought-streams/
+reasoning-cache/
+
+# =========================================================
+# LANGGRAPH / WORKFLOWS
+# =========================================================
+
+.langgraph/
+workflows/runtime/
+workflow-cache/
+
+# =========================================================
+# GENERATED UI SURFACES
+# =========================================================
+
+.surfaces/
+kanvas/
+plans/
+
+generated-ui/
+surface-cache/
+
+# =========================================================
+# VOICE / AUDIO
+# =========================================================
+
+temp_speech.mp3
+temp_audio.wav
+voice-cache/
+tts-cache/
+
+# =========================================================
+# PYTHON
+# =========================================================
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.python-version
+venv/
+.venv/
+
+# =========================================================
+# CHROME / PUPPETEER
+# =========================================================
+
+puppeteer_data/
+playwright/.cache/
+
+# =========================================================
+# CLOUD / DEPLOYMENT
+# =========================================================
+
+.cloud-link.json
+
+railway.json.local
+.vercel.local
+
+# =========================================================
+# VECTOR DATABASES
+# =========================================================
+
+chroma/
+weaviate/
+qdrant/
+pinecone-cache/
+
+# =========================================================
+# DATABASES
+# =========================================================
+
+*.sqlite
+*.sqlite3
+*.db
+
+# =========================================================
+# USER DATA
+# =========================================================
+
+data/
+userdata/
+workspace-data/
+
+# =========================================================
+# MEDIA / GENERATED ASSETS
+# =========================================================
+
+renders/
+exports/
+generated-images/
+generated-video/
+
+# Optional:
+# public/generated/
+
+# =========================================================
+# TESTING
+# =========================================================
+
+screenshots/
+playwright-report/
+test-results/
+
+# =========================================================
+# MCP / PLUGINS
+# =========================================================
+
+.plugins-data/
+plugin-cache/
+
+# =========================================================
+# IDE / EDITOR
+# =========================================================
+
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+!.vscode/settings.json
+
+.idea/
+
+.cursorrules
+
+# =========================================================
+# CONFIDENTIAL
+# =========================================================
+
+confidentiality-policies.json
+
+osint-incidents.json
+telemetry.json
+regional-news.json
+fetch_telemetry.js
+
+# =========================================================
+# TEMP FILES
+# =========================================================
+
+*.tmp
+*.temp
+.cache/
+tmp/
+
+# =========================================================
+# MAC / LINUX EXECUTABLES
+# =========================================================
+
+*.dmg
+*.AppImage
+
+# =========================================================
+# WINDOWS BUILDS
+# =========================================================
+
+win-build/
+*.exe
+*.msi
+
+# =========================================================
+# BACKUPS
+# =========================================================
+
+*.bak
+*.backup
+*.old
+
+# =========================================================
+# OPTIONAL PUBLIC ASSETS
+# Uncomment if desired
+# =========================================================
+
+# public/assets/private/
+# public/voice/
+# public/memory/
