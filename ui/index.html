@@ -1,28 +1,323 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
+    <!-- Core -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <!-- Viewport -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    />
+
+    <!-- Branding -->
+    <title>QueenZoe • EliteQueen Command Interface</title>
+
+    <meta
+      name="title"
+      content="QueenZoe • Sovereign Executive Intelligence"
+    />
+
+    <meta
+      name="description"
+      content="QueenZoe — EliteQueen Agent Commander. Persistent executive cognition, multi-agent orchestration, runtime intelligence, memory systems, delegation architecture, and sovereign command operations."
+    />
+
+    <meta
+      name="keywords"
+      content="QueenZoe,HustleNation,AI,Agentic AI,Executive Intelligence,LangGraph,Multi-Agent,System Runtime,Memory AI,PWA,APK"
+    />
+
+    <meta name="author" content="HustleNation" />
+
+    <!-- Theme -->
+    <meta name="theme-color" content="#09090f" />
+    <meta name="color-scheme" content="dark" />
+
+    <!-- Icons -->
+    <link
+      rel="icon"
+      type="image/png"
+      href="/icons/queenzoe-favicon.png"
+    />
+
+    <link
+      rel="apple-touch-icon"
+      href="/icons/queenzoe-192.png"
+    />
+
+    <!-- Manifest -->
     <link rel="manifest" href="/manifest.json" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0a0a0a" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Oboto" />
-    <meta name="description" content="AI-powered assistant with surfaces, tools, and multi-model support" />
-    <title>Oboto</title>
+
+    <!-- PWA -->
+    <meta
+      name="apple-mobile-web-app-capable"
+      content="yes"
+    />
+
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+
+    <meta
+      name="apple-mobile-web-app-title"
+      content="QueenZoe"
+    />
+
+    <meta
+      name="mobile-web-app-capable"
+      content="yes"
+    />
+
+    <!-- OpenGraph -->
+    <meta
+      property="og:type"
+      content="website"
+    />
+
+    <meta
+      property="og:title"
+      content="QueenZoe • EliteQueen Command Interface"
+    />
+
+    <meta
+      property="og:description"
+      content="Sovereign executive intelligence with long-lived cognition, runtime memory, multi-agent orchestration, delegation systems, and strategic operational awareness."
+    />
+
+    <meta
+      property="og:image"
+      content="/images/queenzoe-og.jpg"
+    />
+
+    <meta
+      property="og:theme-color"
+      content="#6d28d9"
+    />
+
+    <!-- Twitter -->
+    <meta
+      name="twitter:card"
+      content="summary_large_image"
+    />
+
+    <meta
+      name="twitter:title"
+      content="QueenZoe • Sovereign Executive Intelligence"
+    />
+
+    <meta
+      name="twitter:description"
+      content="Persistent AI runtime with orchestration, memory, reflection, and executive cognition."
+    />
+
+    <meta
+      name="twitter:image"
+      content="/images/queenzoe-og.jpg"
+    />
+
+    <!-- Fonts -->
+    <link
+      rel="preconnect"
+      href="https://fonts.googleapis.com"
+    />
+
+    <link
+      rel="preconnect"
+      href="https://fonts.gstatic.com"
+      crossorigin
+    />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Ambient Theme Injection -->
+    <style>
+      :root {
+        --qz-black: #07070a;
+        --qz-void: #0f0b1a;
+        --qz-shadow: #15131d;
+
+        --qz-violet: #6d28d9;
+        --qz-purple: #9333ea;
+        --qz-gold: #d4af37;
+        --qz-moon: #d6d6e7;
+
+        --qz-glow: rgba(147, 51, 234, 0.35);
+        --qz-mist: rgba(255, 255, 255, 0.04);
+
+        --qz-border: rgba(255, 255, 255, 0.08);
+      }
+
+      html,
+      body,
+      #root {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+
+        background:
+          radial-gradient(
+            circle at top,
+            rgba(109, 40, 217, 0.18),
+            transparent 45%
+          ),
+          radial-gradient(
+            circle at bottom,
+            rgba(212, 175, 55, 0.08),
+            transparent 35%
+          ),
+          linear-gradient(
+            180deg,
+            #07070a 0%,
+            #0f0b1a 45%,
+            #07070a 100%
+          );
+
+        overflow: hidden;
+
+        color: #ffffff;
+
+        font-family: "Inter", sans-serif;
+
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      body::before {
+        content: "";
+
+        position: fixed;
+        inset: 0;
+
+        background:
+          radial-gradient(
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px
+          );
+
+        background-size: 3px 3px;
+
+        opacity: 0.18;
+
+        pointer-events: none;
+
+        z-index: 0;
+      }
+
+      body::after {
+        content: "";
+
+        position: fixed;
+        inset: 0;
+
+        background:
+          linear-gradient(
+            to bottom,
+            transparent,
+            rgba(109, 40, 217, 0.03),
+            transparent
+          );
+
+        animation: ambientPulse 8s ease-in-out infinite;
+
+        pointer-events: none;
+
+        z-index: 0;
+      }
+
+      @keyframes ambientPulse {
+        0% {
+          opacity: 0.45;
+        }
+
+        50% {
+          opacity: 0.85;
+        }
+
+        100% {
+          opacity: 0.45;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      ::selection {
+        background: rgba(147, 51, 234, 0.4);
+        color: #fff;
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background:
+          linear-gradient(
+            180deg,
+            rgba(109,40,217,0.6),
+            rgba(212,175,55,0.4)
+          );
+
+        border-radius: 999px;
+      }
+    </style>
   </head>
+
   <body>
+    <!-- Runtime Root -->
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- Entry -->
+    <script
+      type="module"
+      src="/src/main.tsx"
+    ></script>
+
+    <!-- PWA Runtime -->
     <script>
-      // Register service worker for PWA installability
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(() => {});
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async () => {
+          try {
+            await navigator.serviceWorker.register("/sw.js");
+
+            console.log(
+              "👑 QueenZoe Runtime Service Worker Active"
+            );
+          } catch (error) {
+            console.warn(
+              "QueenZoe service worker registration failed:",
+              error
+            );
+          }
         });
       }
+    </script>
+
+    <!-- Runtime Boot -->
+    <script>
+      window.QUEENZOE_RUNTIME = {
+        initializedAt: Date.now(),
+        runtimeMode: "sovereign",
+        operationalState: "active",
+        heartbeat: true,
+        persistentRuntime: true
+      };
+
+      console.log(
+        "%c👑 QueenZoe Executive Runtime Initialized",
+        "color:#d4af37;font-size:14px;font-weight:bold;"
+      );
     </script>
   </body>
 </html>
