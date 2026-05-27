@@ -1,17 +1,112 @@
 {
   "compilerOptions": {
-    "target": "es2018",
-    "module": "commonjs",
-    "isolatedModules": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
+    "target": "ES2022",
+
+    "module": "ESNext",
+
+    "moduleResolution": "Bundler",
+
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+
     "jsx": "react-jsx",
+
+    "strict": true,
+
+    "isolatedModules": true,
+
+    "esModuleInterop": true,
+
     "allowSyntheticDefaultImports": true,
-    "types": ["jest", "@testing-library/jest-dom", "node"]
+
+    "resolveJsonModule": true,
+
+    "skipLibCheck": true,
+
+    "forceConsistentCasingInFileNames": true,
+
+    "allowJs": true,
+
+    "checkJs": false,
+
+    "noEmit": true,
+
+    "incremental": true,
+
+    "verbatimModuleSyntax": true,
+
+    "baseUrl": ".",
+
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+
+      "@core/*": [
+        "./src/core/*"
+      ],
+
+      "@kernel/*": [
+        "./src/kernel/*"
+      ],
+
+      "@agents/*": [
+        "./src/agents/*"
+      ],
+
+      "@memory/*": [
+        "./src/memory/*"
+      ],
+
+      "@reflection/*": [
+        "./src/reflection/*"
+      ],
+
+      "@voice/*": [
+        "./src/voice/*"
+      ],
+
+      "@runtime/*": [
+        "./src/runtime/*"
+      ],
+
+      "@tools/*": [
+        "./src/tools/*"
+      ],
+
+      "@vector/*": [
+        "./src/vector/*"
+      ],
+
+      "@ui/*": [
+        "./ui/src/*"
+      ],
+
+      "@components/*": [
+        "./ui/src/components/*"
+      ],
+
+      "@hooks/*": [
+        "./ui/src/hooks/*"
+      ],
+
+      "@services/*": [
+        "./ui/src/services/*"
+      ]
+    },
+
+    "types": [
+      "node",
+      "jest",
+      "@testing-library/jest-dom",
+      "vite/client"
+    ]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"]
-}
+
+  "include": [
+    "src/**/*",
+    "ui/**/*",
+    "plugins
