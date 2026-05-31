@@ -1,31 +1,27 @@
-queenzoe/
-├── frontend/
-│   ├── src/
-│   ├── components/
-│   ├── surfaces/
-│   ├── motion/
-│   ├── themes/
-│   └── voice/
-│
-├── backend/
-│   ├── agents/
-│   ├── langgraph/
-│   ├── memory/
-│   ├── routing/
-│   ├── execution/
-│   └── api/
-│
-├── mobile/
-│   ├── capacitor/
-│   └── android/
-│
-├── assets/
-│   ├── icons/
-│   ├── queen/
-│   ├── particles/
-│   └── moonlight/
-│
-├── docs/
-├── workflows/
-├── vector-db/
-└── deployment/
+ai.mjs
+    │
+    ▼
+src/main.mjs
+    │
+    ├── CLIInterface
+    ├── Event Bus
+    ├── Secrets Manager
+    ├── Workspace Content Server
+    │
+    ▼
+EventicFacade
+    │
+    ▼
+Agent Loop Controller
+    │
+    ├── Task Manager
+    ├── Scheduler Service
+    ├── Checkpoint Manager
+    ├── OpenClaw Manager
+    └── Tool Execution
+    │
+    ▼
+Plugins / Skills
+    │
+    ▼
+UI / Extension / Tray / API
