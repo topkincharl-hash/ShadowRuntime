@@ -1,7 +1,7 @@
 {
-  "name": "oboto-tray",
+  "name": "ShadowQueen-tray",
   "version": "1.2.0",
-  "description": "Oboto system tray service — manages the background AI daemon",
+  "description": "QueenZoe system tray service — manages the background AI daemon",
   "main": "main.js",
   "private": true,
   "repository": {
@@ -17,9 +17,9 @@
     "build:all": "npm run prebuild && electron-builder --mac --win"
   },
   "build": {
-    "appId": "com.oboto.tray",
+    "appId": "com.queen.tray",
     "publish": null,
-    "productName": "Oboto",
+    "productName": "shadowqueen",
     "afterPack": "./scripts/afterPack.js",
     "directories": {
       "output": "dist"
