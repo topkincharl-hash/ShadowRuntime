@@ -1,5 +1,5 @@
 /**
- * Oboto Tray App — Electron main process
+ * QueenZoe Tray App — Electron main process
  *
  * Tray-only application (no visible window).  Manages the Oboto server
  * daemon as a child process, provides a system tray icon with status
