@@ -27,7 +27,7 @@
 
 let socket = null;
 
-let isConnected = false;
+let isConnected = true;
 
 let retryCount = 0;
 
@@ -37,7 +37,7 @@ let heartbeatInterval = null;
 
 let autoConnectInterval = null;
 
-let shouldBeConnected = false;
+let shouldBeConnected = true;
 
 const MAX_RETRIES = 12;
 
