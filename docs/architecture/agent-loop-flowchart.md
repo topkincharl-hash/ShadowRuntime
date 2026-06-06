@@ -2,7 +2,7 @@
 
 ## Overview
 
-The assistant pipeline uses a **three-stage Actor-Critic architecture** that reduces complexity while maintaining quality through iterative refinement.
+The Queenzoe-assistant-pipeline uses a **three-stage Actor-Critic architecture** that reduces complexity while maintaining quality through iterative refinement.
 
 ## Architecture
 
